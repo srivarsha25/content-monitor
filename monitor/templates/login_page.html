@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content Monitor — Login</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #080812;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* Animated grid background */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(99,102,241,0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(99,102,241,0.06) 1px, transparent 1px);
+      background-size: 40px 40px;
+      animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% { transform: translate(0, 0); }
+      100% { transform: translate(40px, 40px); }
+    }
+
+    /* Glowing orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .orb-1 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #6366f1, transparent 70%);
+      top: -150px; left: -150px;
+      animation: orbFloat1 12s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #a855f7, transparent 70%);
+      bottom: -100px; right: -100px;
+      animation: orbFloat2 15s ease-in-out infinite;
+    }
+    .orb-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, #06b6d4, transparent 70%);
+      top: 50%; left: 60%;
+      animation: orbFloat3 10s ease-in-out infinite;
+    }
+
+    @keyframes orbFloat1 {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(80px, 60px) scale(1.15); }
+    }
+    @keyframes orbFloat2 {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(-60px, -80px) scale(1.1); }
+    }
+    @keyframes orbFloat3 {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      33% { transform: translate(-40px, 40px) scale(0.9); }
+      66% { transform: translate(40px, -30px) scale(1.1); }
+    }
+
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+    .particle {
+      position: absolute;
+      width: 2px; height: 2px;
+      background: rgba(99,102,241,0.6);
+      border-radius: 50%;
+      animation: particleFloat linear infinite;
+    }
+
+    @keyframes particleFloat {
+      0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100px) translateX(var(--drift)); opacity: 0; }
+    }
+
+    /* Main card */
+    .card {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 420px;
+      margin: 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 28px;
+      padding: 52px 44px;
+      backdrop-filter: blur(24px);
+      animation: cardIn 0.8s cubic-bezier(0.16,1,0.3,1) forwards;
+      opacity: 0;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(40px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Glowing border on card */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 28px;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.4), rgba(168,85,247,0.2), rgba(6,182,212,0.2));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .logo {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #06b6d4 100%);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+      font-size: 24px;
+      animation: logoPulse 3s ease-in-out infinite;
+      box-shadow: 0 0 40px rgba(99,102,241,0.4);
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(99,102,241,0.3); }
+      50% { box-shadow: 0 0 60px rgba(99,102,241,0.6), 0 0 100px rgba(168,85,247,0.3); }
+    }
+
+    .brand h1 {
+      color: #fff;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    .brand p {
+      color: rgba(255,255,255,0.35);
+      font-size: 13px;
+      margin-top: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+      animation: fieldIn 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+      opacity: 0;
+    }
+    .form-group:nth-child(1) { animation-delay: 0.3s; }
+    .form-group:nth-child(2) { animation-delay: 0.4s; }
+
+    @keyframes fieldIn {
+      from { opacity: 0; transform: translateX(-16px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .form-group label {
+      display: block;
+      color: rgba(255,255,255,0.5);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 15px 18px;
+      color: #fff;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: rgba(99,102,241,0.7);
+      background: rgba(99,102,241,0.07);
+      box-shadow: 0 0 0 4px rgba(99,102,241,0.12), 0 0 20px rgba(99,102,241,0.1);
+    }
+
+    .form-group input::placeholder { color: rgba(255,255,255,0.18); }
+
+    /* Animated submit button */
+    .btn-wrap {
+      margin-top: 10px;
+      animation: fieldIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.5s forwards;
+      opacity: 0;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #6366f1, #a855f7);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(99,102,241,0.5);
+    }
+
+    .submit-btn:hover::before { left: 100%; }
+    .submit-btn:active { transform: translateY(0); }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 28px;
+      color: rgba(255,255,255,0.25);
+      font-size: 12px;
+      animation: fieldIn 0.6s cubic-bezier(0.16,1,0.3,1) 0.6s forwards;
+      opacity: 0;
+    }
+
+    .footer-text a {
+      color: rgba(99,102,241,0.8);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-text a:hover { color: #a855f7; }
+  </style>
+</head>
+<body>
+
+  <div class="grid-bg"></div>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <div class="particles" id="particles"></div>
+
+  <div class="card">
+    <div class="brand">
+      <div class="logo">🛡️</div>
+      <h1>Content Monitor</h1>
+      <p>Sign in to your dashboard</p>
+    </div>
+
+    <div class="form-group">
+      <label for="username">Username</label>
+      <div class="input-wrap">
+        <input type="text" id="username" placeholder="Enter your username" autofocus>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <div class="input-wrap">
+        <input type="password" id="password" placeholder="Enter your password">
+      </div>
+    </div>
+
+    <div class="btn-wrap">
+      <button class="submit-btn" onclick="handleLogin()">Sign in →</button>
+    </div>
+
+    <p class="footer-text">
+      Admin panel? <a href="/admin/">Go to Django admin</a>
+    </p>
+  </div>
+
+  <script>
+    // Generate floating particles
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.animationDuration = (8 + Math.random() * 12) + 's';
+      p.style.animationDelay = (Math.random() * 10) + 's';
+      p.style.setProperty('--drift', (Math.random() * 100 - 50) + 'px');
+      p.style.width = p.style.height = (Math.random() > 0.7 ? 3 : 2) + 'px';
+      p.style.opacity = Math.random() * 0.6 + 0.2;
+      container.appendChild(p);
+    }
+
+    function handleLogin() {
+      const btn = document.querySelector('.submit-btn');
+      btn.textContent = 'Signing in...';
+      btn.style.opacity = '0.7';
+      setTimeout(() => {
+        window.location.href = '/admin/';
+      }, 800);
+    }
+  </script>
+
+</body>
+</html>
